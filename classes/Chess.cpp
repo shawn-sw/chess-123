@@ -1,6 +1,8 @@
 #include "Chess.h"
 #include <limits>
 #include <cmath>
+#include <sstream>
+#include <cctype>
 
 Chess::Chess()
 {
@@ -34,6 +36,7 @@ Bit* Chess::PieceForPlayer(const int playerNumber, ChessPiece piece)
     std::string spritePath = std::string("") + (playerNumber == 0 ? "w_" : "b_") + pieceName;
     bit->LoadTextureFromFile(spritePath.c_str());
     bit->setOwner(getPlayerAt(playerNumber));
+    bit->setGameTag((playerNumber == 0 ? 0 : 128) + static_cast<int>(piece));
     bit->setSize(pieceSize, pieceSize);
 
     return bit;
@@ -46,21 +49,76 @@ void Chess::setUpBoard()
     _gameOptions.rowY = 8;
 
     _grid->initializeChessSquares(pieceSize, "boardsquare.png");
-    FENtoBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+    FENtoBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1");
+    
 
     startGame();
 }
 
 void Chess::FENtoBoard(const std::string& fen) {
-    // convert a FEN string to a board
-    // FEN is a space delimited string with 6 fields
-    // 1: piece placement (from white's perspective)
-    // NOT PART OF THIS ASSIGNMENT BUT OTHER THINGS THAT CAN BE IN A FEN STRING
-    // ARE BELOW
-    // 2: active color (W or B)
-    // 3: castling availability (KQkq or -)
-    // 4: en passant target square (in algebraic notation, or -)
-    // 5: halfmove clock (number of halfmoves since the last capture or pawn advance)
+    // Accept either board-only FEN or full FEN by using the first space-delimited field.
+    std::istringstream fenStream(fen);
+    std::string placement;
+    fenStream >> placement;
+    if (placement.empty()) {
+        return;
+    }
+
+    // Clear any existing pieces first.
+    _grid->forEachSquare([](ChessSquare* square, int x, int y) {
+        square->destroyBit();
+    });
+
+    int x = 0;
+    int y = 7; // FEN starts at rank 8, while our board uses y=0 for rank 1.
+
+    for (char c : placement) {
+        if (c == '/') {
+            if (x != 8) {
+                return;
+            }
+            x = 0;
+            --y;
+            if (y < 0) {
+                return;
+            }
+            continue;
+        }
+
+        if (std::isdigit(static_cast<unsigned char>(c))) {
+            x += c - '0';
+            if (x > 8) {
+                return;
+            }
+            continue;
+        }
+
+        ChessPiece piece = NoPiece;
+        switch (static_cast<char>(std::tolower(static_cast<unsigned char>(c)))) {
+            case 'p': piece = Pawn; break;
+            case 'n': piece = Knight; break;
+            case 'b': piece = Bishop; break;
+            case 'r': piece = Rook; break;
+            case 'q': piece = Queen; break;
+            case 'k': piece = King; break;
+            default: return;
+        }
+
+        if (x >= 8 || y < 0 || y > 7) {
+            return;
+        }
+
+        const int playerNumber = std::isupper(static_cast<unsigned char>(c)) ? 0 : 1;
+        Bit* bit = PieceForPlayer(playerNumber, piece);
+        ChessSquare* square = _grid->getSquare(x, y);
+        bit->setPosition(square->getPosition());
+        square->setBit(bit);
+        ++x;
+    }
+
+    if (x != 8 || y != 0) {
+        return;
+    }
 }
 
 bool Chess::actionForEmptyHolder(BitHolder &holder)
