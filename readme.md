@@ -5,6 +5,9 @@ The project is built on top of the starter framework provided by UCSC CMPM 123.
 
 ## FEN Support and Features
 
+<img width="968" height="788" alt="Screenshot 2026-02-18 at 6 35 57 PM" src="https://github.com/user-attachments/assets/1e05900c-35b5-492d-b9f7-b7cbc95cc37f" />
+<img width="1050" height="811" alt="Screenshot 2026-02-18 at 6 33 52 PM" src="https://github.com/user-attachments/assets/a03ddfe7-5f6d-459f-aa5e-9fe3ed880520" />
+
 ### FEN-Based Board Initialization
 
 The chess engine supports initializing the board from Forsyth-Edwards Notation (FEN) strings.
@@ -12,7 +15,6 @@ The chess engine supports initializing the board from Forsyth-Edwards Notation (
 Supported input formats:
 
 1. Piece placement only
-
 ```cpp
 FENtoBoard("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
 ```
