@@ -62,13 +62,19 @@ namespace ClassGame {
                         game->setUpBoard();
                     }
                 } else {
+                    if (dynamic_cast<Chess *>(game) && ImGui::Button("Reset Chess")) {
+                        game->stopGame();
+                        game->setUpBoard();
+                        gameOver = false;
+                        gameWinner = -1;
+                    }
                     ImGui::Text("Current Player Number: %d", game->getCurrentPlayer()->playerNumber());
                     std::string stateString = game->stateString();
                     int stride = game->_gameOptions.rowX;
                     int height = game->_gameOptions.rowY;
 
-                    for(int y=0; y<height; y++) {
-                        ImGui::Text("%s", stateString.substr(y*stride,stride).c_str());
+                    for(int y=height - 1; y>=0; y--) {
+                        ImGui::Text("%s", stateString.substr(y * stride, stride).c_str());
                     }
                     ImGui::Text("Current Board State: %s", game->stateString().c_str());
                 }
