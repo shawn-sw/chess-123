@@ -41,6 +41,7 @@ public:
 	BitHolder *getHolder();
 	// which player owns me
 	Player *getOwner();
+	const Player *getOwner() const;
 	void setOwner(Player *player) { _owner = player; };
 	// helper functions
 	bool friendly();
