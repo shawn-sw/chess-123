@@ -76,6 +76,11 @@ Player *Bit::getOwner()
 	return _owner;
 }
 
+const Player *Bit::getOwner() const
+{
+	return _owner;
+}
+
 void Bit::moveTo(const ImVec2 &point)
 {
 	_destinationPosition = point;
